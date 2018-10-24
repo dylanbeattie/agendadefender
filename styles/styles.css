@@ -1,0 +1,50 @@
+html {
+    font-family: Arial;
+}
+
+div#agenda {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #000;
+    display: none;
+}
+div.agenda-item {
+    box-sizing: border-box;
+    position: absolute;
+    border: 1px solid #000;
+    background-color: #fff;
+    color: #000;
+    left: 0;
+    right: 0;
+    font-size: 150%;
+    padding: 20px;
+    text-overflow: clip;
+    white-space: nowrap;
+}
+div.agenda-item h3 {
+    margin: 10px 0;
+}
+
+div.agenda-item.concluded {
+    background-color: #333;
+    color: #999;
+}
+
+div#ticker {
+    background-color: #f007;
+    position: absolute;
+    left: 0;
+    z-index: 99;
+    mix-blend-mode: darken;  
+}
+
+textarea {
+    width: 100%;
+    height: 400px;
+    font-size: 32pt;
+    font-weight: bold;
+    line-height: 1.6em;
+}
