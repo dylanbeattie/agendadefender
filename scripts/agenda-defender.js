@@ -1,77 +1,124 @@
-function agendaItem (title, commencesAt, concludesAt) {
-    this.title = title;
-    this.commencesAt = commencesAt;
-    this.concludesAt = concludesAt;
-    this.element = null;
 
-    this.toString = function() {
-        return(`${title} (${commencesAt} - ${concludesAt})`);
+var Agenda = {
+
+    parseItem: function (itemString) {
+        try {
+            console.debug(itemString);
+            var agendaItemRegExp = /^(\d\d):(\d\d)\s+(.*)$/;
+            var tokens = agendaItemRegExp.exec(itemString);
+            console.debug(tokens);
+            var hour = parseInt(tokens[1]);
+            var minute = parseInt(tokens[2]);
+            var time = new Date();
+            time.setHours(hour);
+            time.setMinutes(minute);
+            time.setSeconds(0);
+            time.setMilliseconds(0);
+            return {
+                commencesAt: time,
+                text: itemString
+            }
+        } catch (e) {
+            console.warn(e);
+            return (null);
+        }
+    },
+
+    parse: function (agendaString, offset) {
+        var items = agendaString.split(/\n/).map(line => this.parseItem(line)).filter(line => line != null);
+        if (offset) {
+            items.forEach(function(item, index, array) {
+                item.commencesAt = newDate(item.commencesAt.valueOf() + offset)
+            });
+        }
+        for(var i = 0; i < (items.length-1); i++) items[i].concludesAt = items[i+1].commencesAt;
+        items.pop();
+        console.debug(items);
+        return items;
     }
-    this.schedule = function() {
-        return(`${this.commencesAt.toLocaleTimeString().substring(0,5)} - ${this.concludesAt.toLocaleTimeString().substring(0,5)} (${(this.concludesAt - this.commencesAt)/60000} mins)`);
+}
+
+function simulateAgenda() {
+    var topics = new Array("Introduction", "Update about Aardvarks", "Bees: The Hidden Killer", "Cats Are Best", "Dave Reads His Emails", "Effective Scheduling from Ellie",
+        "Fish Like Fruit", "Galahad", "Herbs and Spices", "Iguanodon Update from Leroy", "Jakarta Project Update", "Kate's Fun Fact");
+    var time = new Date();
+    var items = new Array();
+    time.setMinutes(time.getMinutes() - 2);
+    for (var i = 0; i < 10; i++) {
+        var item = time.getHours().toString().padStart(2, '0') + ":" + time.getMinutes().toString().padStart(2, '0') + " " + topics[i];
+        items.push(item);
+        time.setMinutes(time.getMinutes() + 1);
     }
+    item = time.getHours().toString().padStart(2, '0') + ":" + time.getMinutes().toString().padStart(2, '0') + " FINISH";
+    items.push(item);
+    var agenda = items.join("\n");
+    $("#agenda").html(agenda);
 }
 
 function runMeeting() {
-    var list = $("#agenda-items").val();
-    var lines = list.split(/\n/);
-    console.log(`Found ${lines.length} lines`)
-    //var midnight = new Date(); // in LOCAL time
-    //midnight.setHours(0,0,0,0); // midnight last night, in LOCAL time.
-    var items = new Array();
-    for(var i = 0; i < lines.length; i++) {
-        var tuple = lines[i].split(/ +/);
-        var timeString = tuple[0];
-        var title = tuple.splice(1).join(' ' );
+    var agendaString = $("#agenda").val();
+    console.debug(agendaString);
+    var agenda = Agenda.parse(agendaString);
+    var $ticker = $("#ticker");
+    $ticker.html('');
+    var tickerHeight = $ticker.height();
+    console.debug(tickerHeight);
+    var elementHeight = Math.floor(tickerHeight / agenda.length);
+    console.debug(elementHeight);
+    agenda.forEach(function(item, index, array) {
+        $div = $("<div class='agenda-item' />");
+        $span = $("<span class='agenda-item-text' />")
+        $span.text(item.text);
+        $span.css("font-size", (elementHeight / 2) + "px");        
+        $div.css("height", (elementHeight - 10) + "px");        
+        $div.append($span);
+        console.debug(item.text);
+        $progressBar = $("<div class='progress-bar' />");
+        item.element = $div;
+        item.progressBar = $progressBar;
+        $div.append($progressBar);
+        $ticker.append($div);
 
-        var parts = timeString.split(/:/);
-        var hour = parseInt(parts[0]);
-        var min = parseInt(parts[1]);
-        var time = new Date();
-        time.setHours(hour, min, 0, 0);
-        items.push(new agendaItem(title, time));
-    }
-    for(var i = 0; i < items.length-1; i++) {
-        items[i].concludesAt = items[i+1].commencesAt;
-    }
-    items.pop(); // remove the Finish element
-    var elementHeight = $("#agenda").height() / (items.length-1)
-    for(var i = 0; i < items.length; i++) {
-        var $element = $(`<div class="agenda-item id="agenda-item-${i}"><h3>${items[i].title}</h3>${items[i].schedule()}</div>`);
-        $element.height(elementHeight);
-        $element.css({"top" : (i * elementHeight) + "px"});
-        $("#agenda").append($element);
-        items[i].element = $element;
-    }
-    $("#agenda").show();
-    var render = tick(items);
-    render();
-    window.setInterval(render, 50);
+    });
+    $("#ticker").show();
+    $("a#close-ticker").show();
+    window.ticker = window.setInterval(makeTicker(agenda), 10);
 }
 
-function tick(items) {
-    var $ticker = $("#ticker");
+function makeTicker(agenda) {
     return function() {
         var now = new Date();
-        while (items[0].concludesAt < now) {
-            items[0].element.addClass("concluded");
-            items.shift();
-            console.log(items.length);
-            if (items.length == 0) return;
-            $ticker.css({"top" : Math.floor(items[0].element.position().top) + "px"});
-            $ticker.height(Math.floor(items[0].element.outerHeight()));
-        }
-        if (items.length > 1) {
-            var duration = items[0].concludesAt.valueOf() - items[0].commencesAt.valueOf(); // total duration of this agenda item, in milliseconds
-            var elapsed = now.valueOf() - items[0].commencesAt.valueOf();
-            var multiplier = elapsed / duration;
-            var width = Math.floor($("#agenda").width() * multiplier);
-            $ticker.width(width);
-        }
-    }
+        agenda.forEach(function(item, index, array) {
+            if (item.concludesAt < now) {
+                item.progressBar.hide();
+                item.element.addClass('finished');
+            }
+            if (item.commencesAt < now && item.concludesAt > now) {
+                var duration = item.concludesAt.valueOf() - item.commencesAt.valueOf();
+                var elapsed = now.valueOf() - item.commencesAt.valueOf();
+                var multiplier = elapsed / duration;
+                var newWidth = item.element.width() * multiplier;
+                item.progressBar.css("width", newWidth + "px");
+            }
+        });
+    };
+}
+function tick() {
+
 }
 
-$(function() {
-    $("#run-meeting-button").click(runMeeting)
-    runMeeting();
+function hashify() {
+    window.location.hash = btoa($("#agenda").val());
+}
+
+function stopMeeting() {
+    window.clearInterval(window.ticker);
+    $("a#close-ticker").hide();
+    $("#ticker").hide();
+}
+$(function () {
+    simulateAgenda();
+    hashify();
+    $("a#close-ticker").click(stopMeeting);
+    $("#run-meeting-button").click(runMeeting);
 });

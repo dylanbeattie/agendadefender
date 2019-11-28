@@ -7,30 +7,15 @@
 <body>
     <h1>AGENDA DEFENDER</h1>
     <p>Let's have a meeting!</p>
-    <textarea id="agenda-items" placeholder="13:58 Intro
+    <textarea id="agenda" placeholder="13:58 Intro
 13:59 Alice Aggressively Argues Against Ambulance Administration
 14:00 Bob
 14:01 Report from Chris about the thing
-14:02 FINISH">15:18 Intro
-15:20 Alice Aggressively Argues Against Air Ambulance Administration
-15:22 Bob Brings Biscuits Baked By Bethany, Bob's Beloved
-15:24 Report from Chris about the thing
-15:26 Dennis Does Digeridoo Discipline Daily
-15:28 Eddie Eats Elephants Elsewhere 
-15:30 Flying Foxes Frequently Frighten Fainthearted Folk
-15:35 FINISH</textarea>
-<label for="sound-one-minute-warning-input"> 
-        <input type="checkbox" checked="checked" id="sound-one-minute-warning-input" name="sound-one-minute-warning" />
-        One minute warning
-</label>
-<label for="play-countdown-music-input"> 
-    <input type="checkbox" checked="checked" id="play-countdown-music-input" name="play-countdown-music" />
-        use CountdownTM music</label>
+14:02 FINISH"></textarea>
     <input type="submit" value="GO" id="run-meeting-button" />
-<div id="agenda">
-    <div id="ticker"></div>
-    (the agenda will be drawn here)
-</div>
+    <div id="ticker">
+    </div>
+    <a id="close-ticker" href="#">&times;</a>
     <script src="scripts/agenda-defender.js" type="text/javascript"></script>
 </body>
 </html>
