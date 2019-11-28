@@ -1,21 +1,31 @@
 <!DOCTYPE html>
+
 <head>
     <title>Agenda Defender</title>
     <link type="text/css" rel="stylesheet" href="styles/styles.css" />
     <script src="scripts/jquery-3.3.1.min.js" type="text/javascript"></script>
 </head>
+
 <body>
-    <h1>AGENDA DEFENDER</h1>
-    <p>Let's have a meeting!</p>
-    <textarea id="agenda" placeholder="13:58 Intro
-13:59 Alice Aggressively Argues Against Ambulance Administration
-14:00 Bob
-14:01 Report from Chris about the thing
-14:02 FINISH"></textarea>
-    <input type="submit" value="GO" id="run-meeting-button" />
+    <div id="textarea-wrapper">
+        <textarea id="agenda" placeholder="15:00 type your agenda here
+15:05 one item per line
+15:10 like this
+15:15 then click 'let's go'
+15:30 FINISH"></textarea>
+    </div>
+    <div id="controls-wrapper">
+        <h1>Agenda Defender</h1>
+        <section>
+        <p>a web thing by <a href="https://dylanbeattie.net/">@dylanbeattie</a></p>
+        <p><a href="https://github.com/dylanbeattie/agenda-defender">code on github</a></p>
+        </section>
+        <input type="submit" value="Let's go!" id="run-meeting-button" />
+    </div>
     <div id="ticker">
     </div>
     <a id="close-ticker" href="#">&times;</a>
     <script src="scripts/agenda-defender.js" type="text/javascript"></script>
 </body>
+
 </html>
