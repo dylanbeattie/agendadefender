@@ -34,15 +34,22 @@ div#controls-wrapper section p {
 
 div#controls-wrapper input#run-meeting-button {
     margin: 10px auto;
-    border-radius: 16px;
-    padding: 16px;
+    border-radius: 36px;
+    width: 72px;
+    height: 72px;
     color: #fff;
     background-color: #090;
-    font-size: 32px;
+    font-size: 48px;
+    padding: 2px 0px 32px 6px;
+    overflow: hidden;
     font-weight: bold;
     border: 5px solid #060;
     cursor: pointer;
-    
+    text-align: center;
+}
+div#controls-wrapper input#run-meeting-button:hover {
+    color: #cfc;
+    border-color: #393;
 }
 
 textarea#agenda {

@@ -42,9 +42,9 @@ function drawSampleAgenda() {
     var topics = new Array(
         "This is Agenda Defender!", 
         "List your agenda items", 
-        "Times are local hh:mm",
+        "Times are local, 24-hour clock, HH:mm",
         "Put the FINISH time last",
-        "Then click 'let's go'",
+        "Then click '&#9654;'",
         "Use it to run meetings,",
         "for giving talks and presentations,",
         "or whatever you like, really :)");
