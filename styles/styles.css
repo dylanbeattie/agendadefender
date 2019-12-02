@@ -34,13 +34,11 @@ div#controls-wrapper section p {
 
 div#controls-wrapper input#run-meeting-button {
     margin: 10px auto;
-    border-radius: 36px;
-    width: 72px;
-    height: 72px;
+    border-radius: 44px;
+    padding: 4px 10px;
     color: #fff;
     background-color: #090;
     font-size: 48px;
-    padding: 2px 0px 32px 6px;
     overflow: hidden;
     font-weight: bold;
     border: 5px solid #060;

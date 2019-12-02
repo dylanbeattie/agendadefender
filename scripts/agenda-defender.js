@@ -44,7 +44,7 @@ function drawSampleAgenda() {
         "List your agenda items", 
         "Times are local, 24-hour clock, HH:mm",
         "Put the FINISH time last",
-        "Then click '&#9654;'",
+        "Then click 'GO!'",
         "Use it to run meetings,",
         "for giving talks and presentations,",
         "or whatever you like, really :)");
