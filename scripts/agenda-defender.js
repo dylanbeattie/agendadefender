@@ -1,47 +1,56 @@
 
-var Agenda = {
+function AgendaItem(timePart1, timePart2, text) {
+    this.timePart1 = timePart1;
+    this.timePart2 = timePart2,
+        this.text = text;
+    this.isRelativeMode = timePart1 == 0 && timePart2 == 0;
+    this.getAbsoluteTime = function () {
+        var time = new Date();
+        time.setHours(timePart1);
+        time.setMinutes(timePart2);
+        time.setSeconds(0);
+        time.setMilliseconds(0);
+        return time;
+    }
+    this.getRelativeTime = function (baseline) {
+        var time = new Date(baseline);
+        time.setMinutes(time.getMinutes() + timePart1);
+        time.setSeconds(time.getSeconds() + timePart2);
+        return (time);
+    }
+}
 
+var Agenda = {
     parseItem: function (itemString) {
         try {
             console.debug(itemString);
             var agendaItemRegExp = /^(\d\d):(\d\d)\s+(.*)$/;
             var tokens = agendaItemRegExp.exec(itemString);
-            console.debug(tokens);
-            var hour = parseInt(tokens[1]);
-            var minute = parseInt(tokens[2]);
-            var time = new Date();
-            time.setHours(hour);
-            time.setMinutes(minute);
-            time.setSeconds(0);
-            time.setMilliseconds(0);
-            return {
-                commencesAt: time,
-                text: itemString
-            }
+            var p1 = parseInt(tokens[1]);
+            var p2 = parseInt(tokens[2]);
+            return new AgendaItem(p1, p2, itemString);
         } catch (e) {
             console.warn(e);
             return (null);
         }
     },
 
-    parse: function (agendaString, offset) {
+    parse: function (agendaString) {
         var items = agendaString.split(/\n/).map(line => this.parseItem(line)).filter(line => line != null);
-        if (offset) {
-            items.forEach(function(item, index, array) {
-                item.commencesAt = newDate(item.commencesAt.valueOf() + offset)
-            });
-        }
-        for(var i = 0; i < (items.length-1); i++) items[i].concludesAt = items[i+1].commencesAt;
+        var relativeMode = items[0].isRelativeMode;
+        var now = new Date();
+        items.forEach(item => item.commencesAt = (relativeMode ? item.getRelativeTime(now) : item.getAbsoluteTime()));
+        for (var i = 0; i < (items.length - 1); i++) items[i].concludesAt = items[i + 1].commencesAt;
         items.pop();
         console.debug(items);
         return items;
     }
 }
 
-function drawSampleAgenda() {
+function drawSampleAgenda(event) {
     var topics = new Array(
-        "This is Agenda Defender!", 
-        "List your agenda items", 
+        "This is Agenda Defender!",
+        "List your agenda items",
         "Times are local, 24-hour clock, HH:mm",
         "Put the FINISH time last",
         "Then click 'GO!'",
@@ -60,7 +69,40 @@ function drawSampleAgenda() {
     items.push(item);
     var agenda = items.join("\n");
     $("#agenda").html(agenda);
+    if (event && event.preventDefault) event.preventDefault();
+    return(false);
 }
+
+function drawRelativeAgenda(event) {
+    $("#agenda").html(`00:00 Introduction to lightning talks
+00:30 How I learned to love three-minute talks
+01:00 The history of pecha kucha
+01:30 Rehearsal tips for lightning talks
+02:00 Scheduling tips
+02:30 Funny stories
+03:00 FINISH`);
+    event.preventDefault();
+    return(false);
+}
+
+// function saveToUrlHash() {
+//     var base64 = btoa($("#agenda").html());
+//     var hash = base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=+$/, '');
+//     window.location.hash = hash;
+// }
+
+// function loadUrlHash() {
+//     var hash = window.location.hash.substring(1);
+//     if (! hash) return(false);
+//     try {
+//     var base64 = hash.replace(/-/g, '+').replace(/_/g, '/') + "==";
+//     $("#agenda").html(atob(base64));
+//     return(true);
+//     } catch(err) {
+//         console.log(err);
+//         return(false);
+//     }
+// }
 
 function runMeeting() {
     var agendaString = $("#agenda").val();
@@ -69,14 +111,16 @@ function runMeeting() {
     $ticker.html('');
     var tickerHeight = $ticker.height();
     var elementHeight = Math.floor(tickerHeight / agenda.length);
-    agenda.forEach(function(item, index, array) {
+    agenda.forEach(function (item, index, array) {
         $div = $("<div class='agenda-item' />");
         $span = $("<span class='agenda-item-text' />")
         $span.text(item.text);
-        $span.css("font-size", (elementHeight / 2) + "px");        
+        var fontSize = (elementHeight / 3);
+        if (fontSize > 200) fontSize = 200;
+        $span.css("font-size", fontSize + "px");
         var itemHeight = (elementHeight - 6) + "px";
         $div.css("height", itemHeight);
-        $div.css("line-height", itemHeight);        
+        $div.css("line-height", itemHeight);
         $div.append($span);
         console.debug(item.text);
         $progressBar = $("<div class='progress-bar' />");
@@ -93,9 +137,9 @@ function runMeeting() {
 }
 
 function makeTicker(agenda) {
-    return function() {
+    return function () {
         var now = new Date();
-        agenda.forEach(function(item, index, array) {
+        agenda.forEach(function (item, index, array) {
             if (item.concludesAt < now) {
                 item.progressBar.hide();
                 item.element.addClass('finished');
@@ -118,10 +162,17 @@ function stopMeeting() {
     window.running = false;
 }
 $(function () {
+    // if (!loadUrlHash()) 
     drawSampleAgenda();
-    window.addEventListener("resize", function() {
+    window.addEventListener("resize", function () {
         if (window.running) runMeeting();
     }, false);
+    // $("#agenda").on("keyup", saveToUrlHash);
+    $("a#relative-example").click(drawRelativeAgenda);
+    $("a#absolute-example").click(drawSampleAgenda);
     $("a#close-ticker").click(stopMeeting);
     $("#run-meeting-button").click(runMeeting);
+    $(document).on('keyup', function (e) {
+        if (e.key == "Escape") stopMeeting();
+    });
 });
