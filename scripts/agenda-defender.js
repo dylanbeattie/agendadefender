@@ -1,8 +1,15 @@
 
 function AgendaItem(timePart1, timePart2, text) {
     this.timePart1 = timePart1;
-    this.timePart2 = timePart2,
+    this.timePart2 = timePart2;
+    var tokens = text.split(' ');
+    if (/^#[0-9a-f]{3,6}$/i.test(tokens[1])) {
+        var prefix = tokens.shift();
+        this.color = tokens.shift();
+        this.text = prefix + ' ' + tokens.join(' ');
+    } else {
         this.text = text;
+    }
     this.isRelativeMode = timePart1 == 0 && timePart2 == 0;
     this.getAbsoluteTime = function () {
         var time = new Date();
@@ -23,7 +30,6 @@ function AgendaItem(timePart1, timePart2, text) {
 var Agenda = {
     parseItem: function (itemString) {
         try {
-            console.debug(itemString);
             var agendaItemRegExp = /^(\d\d):(\d\d)\s+(.*)$/;
             var tokens = agendaItemRegExp.exec(itemString);
             var p1 = parseInt(tokens[1]);
@@ -70,10 +76,23 @@ function drawSampleAgenda(event) {
     var agenda = items.join("\n");
     $("#agenda").html(agenda);
     if (event && event.preventDefault) event.preventDefault();
-    return(false);
+    return (false);
 }
 
-function drawRelativeAgenda(event) {
+function draw45MinuteTalk(event) {
+    $("#agenda").html(`00:00 Intro and welcome
+05:00 Context: why are database deployments hard?
+08:00 Rolling forward, rolling back
+13:00 Schema management
+18:00 Working with static data and lookup data
+25:00 Live demonstration
+40:00 Conclusion and next steps
+45:00 FINISH`);
+    event.preventDefault();
+    return (false);
+}
+
+function drawLightningTalk(event) {
     $("#agenda").html(`00:00 Introduction to lightning talks
 00:30 How I learned to love three-minute talks
 01:00 The history of pecha kucha
@@ -82,7 +101,7 @@ function drawRelativeAgenda(event) {
 02:30 Funny stories
 03:00 FINISH`);
     event.preventDefault();
-    return(false);
+    return (false);
 }
 
 // function saveToUrlHash() {
@@ -124,6 +143,7 @@ function runMeeting() {
         $div.append($span);
         console.debug(item.text);
         $progressBar = $("<div class='progress-bar' />");
+        if (item.color) $progressBar.css("color", item.color);
         item.element = $div;
         item.progressBar = $progressBar;
         $div.append($progressBar);
@@ -168,7 +188,8 @@ $(function () {
         if (window.running) runMeeting();
     }, false);
     // $("#agenda").on("keyup", saveToUrlHash);
-    $("a#relative-example").click(drawRelativeAgenda);
+    $("a#lightning-talk").click(drawLightningTalk);
+    $("a#45-minute-talk").click(draw45MinuteTalk);
     $("a#absolute-example").click(drawSampleAgenda);
     $("a#close-ticker").click(stopMeeting);
     $("#run-meeting-button").click(runMeeting);

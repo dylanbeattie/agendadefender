@@ -15,7 +15,7 @@ div#controls-wrapper {
     position: absolute;
     left: 0;
     bottom: 0px;
-    height: 100px;
+    height: 96px;
     right: 0;
     text-align: center;
 }
@@ -23,11 +23,16 @@ div#controls-wrapper div#blurb {
     position: absolute;
     left: 10px;
     text-align: left;
+    padding: 4px;
 }
-div#controls-wrapper div#blurb h1 {
-    text-align: left;
-    font-size:140%;
-    margin: 8px 0;
+div#controls-wrapper div#blurb ul {
+    margin: 0;
+    padding: 0;
+}
+div#controls-wrapper div#blurb ul li {
+    list-style-position: inside;
+    list-style-type:square;
+    margin: 2px 0;
 }
 
 div#controls-wrapper section {
@@ -36,12 +41,13 @@ div#controls-wrapper section {
 }
 div#controls-wrapper section p {
     text-align: right;
-    font-size: 120%;
+    margin: 4px 0;
 }
 
 div#controls-wrapper input#run-meeting-button {
+    z-index: 99;
     margin: 10px auto;
-    border-radius: 44px;
+    border-radius: 8px;
     padding: 4px 10px;
     color: #fff;
     background-color: #090;
